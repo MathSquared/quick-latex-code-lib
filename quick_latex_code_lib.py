@@ -3,9 +3,6 @@
 import os
 import sys
 
-# the first level is never used for naked code
-_nesting_levels = ['part', 'section', 'subsection', 'subsubsection']
-
 
 def dirs_and_files(path):
     ls = os.listdir(path)
@@ -14,22 +11,22 @@ def dirs_and_files(path):
     return dirs, files
 
 
-def recursively_add_subsections(srcdir, dirname, nesting):
+def recursively_add_subsections(srcdir, dirname, nesting, nesting_levels):
     dirs, files = dirs_and_files(srcdir)
-    res = "\\%s{\\texttt{%s}}\n" % (_nesting_levels[nesting - 1], dirname.replace("_", "\\_"))
+    res = "\\%s{\\texttt{%s}}\n" % (nesting_levels[nesting - 1], dirname.replace("_", "\\_"))
 
     for filex in files:
-        res += "\\%s{\\texttt{%s}}\n\\begin{lstlisting}\n" % (_nesting_levels[nesting], (dirname + "/" + filex).replace("_", "\\_"))
+        res += "\\%s{\\texttt{%s}}\n\\begin{lstlisting}\n" % (nesting_levels[nesting], (dirname + "/" + filex).replace("_", "\\_"))
         with open(os.path.join(srcdir, filex)) as fx:
             res += fx.read() + "\n\\end{lstlisting}\n\n"
 
     for dirx in dirs:
-        res += recursively_add_subsections(os.path.join(srcdir, dirx), dirname + "/" + dirx, nesting + 1)
+        res += recursively_add_subsections(os.path.join(srcdir, dirx), dirname + "/" + dirx, nesting + 1, nesting_levels)
 
     return res
 
 
-def recursively_add_sections(srcdir):
+def recursively_add_sections(srcdir, nesting_levels):
     dirs, files = dirs_and_files(srcdir)
     res = "\\part{Top level}"
 
@@ -39,7 +36,7 @@ def recursively_add_sections(srcdir):
             res += fx.read() + "\n\\end{lstlisting}\n\n"
 
     for dirx in dirs:
-        res += recursively_add_subsections(os.path.join(srcdir, dirx), dirx, 1)
+        res += recursively_add_subsections(os.path.join(srcdir, dirx), dirx, 1, nesting_levels)
 
     return res
 
@@ -49,12 +46,18 @@ def main():
     outfile = os.path.abspath(sys.argv[2])
     headfile = os.path.join(srcdir, "../qlib_header.txt")
     footfile = os.path.join(srcdir, "../qlib_footer.txt")
+    nestfile = os.path.join(srcdir, "../qlib_nesting.txt")
+
+    nesting_levels = []
+    with open(nestfile) as nestf:
+        for line in nestf:
+            nesting_levels.append(line.rstrip())
 
     res = ""
     with open(headfile) as headf:
         res += (headf.read() + "\n")
 
-    res += recursively_add_sections(srcdir)
+    res += recursively_add_sections(srcdir, nesting_levels)
 
     with open(footfile) as footf:
         res += (footf.read())
