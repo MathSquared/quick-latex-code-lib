@@ -6,8 +6,8 @@ import sys
 
 def dirs_and_files(path):
     ls = os.listdir(path)
-    dirs = [lse for lse in ls if os.path.isdir(os.path.join(path, lse)) and not lse.startswith(".")]
-    files = [lse for lse in ls if os.path.isfile(os.path.join(path, lse)) and not lse.startswith(".")]
+    dirs = sorted([lse for lse in ls if os.path.isdir(os.path.join(path, lse)) and not lse.startswith(".")])
+    files = sorted([lse for lse in ls if os.path.isfile(os.path.join(path, lse)) and not lse.startswith(".")])
     return dirs, files
 
 
@@ -31,7 +31,7 @@ def recursively_add_sections(srcdir, nesting_levels):
     res = "\\part{Top level}"
 
     for filex in files:
-        res += "\\section{\\texttt{%s}}\n\\begin{lstlisting}\n" % filex
+        res += "\\section{\\texttt{%s}}\n\\begin{lstlisting}\n" % filex.replace("_", "\\_")
         with open(os.path.join(srcdir, filex)) as fx:
             res += fx.read() + "\n\\end{lstlisting}\n\n"
 
