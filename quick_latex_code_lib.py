@@ -10,6 +10,9 @@ def edit_source(src):
     src = re.sub("using namespace std;\\n{1,2}", "", src)
     src = re.sub("# *pylint:.+?\\n{1,2}", "", src)
 
+    # Blank lines before top-of-file constructs
+    src = re.sub("\\n\\n(#include|import|namespace \\{|class)", "\\n\\1", src)
+
     # Short if statements in C++
     src = re.sub("([ \\t]+)((?:if|for|while) ?\\(.{1,25}\\))\\n[ \\t]+(.{1,30})\\n", "\\1\\2 \\3\\n", src)
 
