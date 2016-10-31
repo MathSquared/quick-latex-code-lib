@@ -1,7 +1,19 @@
 #!/usr/bin/env python
 # pylint: disable=missing-docstring,invalid-name
 import os
+import re
 import sys
+
+def edit_source(src):
+    # Standard boilerplate
+    src = re.sub("#include ?<bits/stdc\\+\\+\\.h>\\n{1,2}", "", src)
+    src = re.sub("using namespace std;\\n{1,2}", "", src)
+    src = re.sub("# *pylint:.+?\\n{1,2}", "", src)
+
+    # Short blocks in C++
+    src = re.sub("([ \\t]+)(.{1,30} \\{)\\n[ \\t]+(.{1,30})\\n\\1\\}\\n", "\\1\\2 \\3 }\\n", src)
+
+    return src
 
 
 def dirs_and_files(path):
@@ -18,7 +30,7 @@ def recursively_add_subsections(srcdir, dirname, nesting, nesting_levels):
     for filex in files:
         res += "\\%s{\\texttt{%s}}\n\\begin{lstlisting}\n" % (nesting_levels[nesting], (dirname + "/" + filex).replace("_", "\\_"))
         with open(os.path.join(srcdir, filex)) as fx:
-            res += fx.read() + "\n\\end{lstlisting}\n\n"
+            res += edit_source(fx.read()) + "\n\\end{lstlisting}\n\n"
 
     for dirx in dirs:
         res += recursively_add_subsections(os.path.join(srcdir, dirx), dirname + "/" + dirx, nesting + 1, nesting_levels)
@@ -33,7 +45,7 @@ def recursively_add_sections(srcdir, nesting_levels):
     for filex in files:
         res += "\\section{\\texttt{%s}}\n\\begin{lstlisting}\n" % filex.replace("_", "\\_")
         with open(os.path.join(srcdir, filex)) as fx:
-            res += fx.read() + "\n\\end{lstlisting}\n\n"
+            res += edit_source(fx.read()) + "\n\\end{lstlisting}\n\n"
 
     for dirx in dirs:
         res += recursively_add_subsections(os.path.join(srcdir, dirx), dirx, 1, nesting_levels)
