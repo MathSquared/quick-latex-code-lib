@@ -16,11 +16,19 @@ def edit_source(src):
     # Blank lines before top-of-file constructs
     src = re.sub("\\n\\n(#include|import|namespace \\{|class)", "\\n\\1", src)
 
+    # Empty comment lines
+    src = re.sub("\\n[ \\t]*(?://|#)[ \\t]*\\n", "\\n", src)
+
     # Short if statements in C++
     src = re.sub("([ \\t]+)((?:if|for|while) ?\\(.{1,25}\\))\\n[ \\t]+(.{1,30})\\n", "\\1\\2 \\3\\n", src)
 
     # Short blocks in C++
     src = re.sub("([ \\t]+)(.{1,30} \\{)\\n[ \\t]+(.{1,30})\\n\\1\\}\\n", "\\1\\2 \\3 }\\n", src)
+
+    # Join closing braces
+    src = re.sub("\\n(.{1,65};)\\n[ \\t]*\\}\\n", "\\n\\1 }\\n", src)
+    for _ in range(5):
+        src = re.sub("\\n(.{1,65}\\})\\n[ \\t]*\\}\\n", "\\n\\1}\\n", src)
 
     return src
 
