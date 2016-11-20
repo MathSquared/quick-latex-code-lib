@@ -19,6 +19,10 @@ def edit_source(src):
     # Empty comment lines
     src = re.sub("\\n[ \\t]*(?://|#)[ \\t]*\\n", "\\n", src)
 
+    # Block comments in C++ that take up space
+    src = re.sub("/\\*[ \\t]*\\n[ \\t]*\\*", "/*", src)
+    src = re.sub("[ \\t]*\\n[ \\t]*\\*/", " */", src)
+
     # Short if statements in C++
     src = re.sub("([ \\t]+)((?:if|for|while) ?\\(.{1,25}\\))\\n[ \\t]+(.{1,30})\\n", "\\1\\2 \\3\\n", src)
 
