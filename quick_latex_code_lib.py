@@ -26,7 +26,8 @@ def edit_source(src):
     src = re.sub("([ \\t]+)(.{1,30} \\{)\\n[ \\t]+(.{1,30})\\n\\1\\}\\n", "\\1\\2 \\3 }\\n", src)
 
     # Join closing braces
-    src = re.sub("\\n(.{1,65};)\\n[ \\t]*\\}\\n", "\\n\\1 }\\n", src)
+    for _ in range(5):
+        src = re.sub("\\n(.{1,65};)\\n[ \\t]*\\}\\n", "\\n\\1 }\\n", src)
     for _ in range(5):
         src = re.sub("\\n(.{1,65}\\})\\n[ \\t]*\\}\\n", "\\n\\1}\\n", src)
 
