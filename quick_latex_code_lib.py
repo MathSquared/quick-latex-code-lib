@@ -62,10 +62,10 @@ def recursively_add_subsections(srcdir, dirname, nesting, nesting_levels):
 
 def recursively_add_sections(srcdir, nesting_levels):
     dirs, files = dirs_and_files(srcdir)
-    res = "\\part{Top level}"
+    res = "\\%s{Top level}" % nesting_levels[0]
 
     for filex in files:
-        res += "\\section{\\texttt{%s}}\n\\begin{lstlisting}\n" % filex.replace("_", "\\_")
+        res += "\\%s{\\texttt{%s}}\n\\begin{lstlisting}\n" % (nesting_levels[1], filex.replace("_", "\\_"))
         with open(os.path.join(srcdir, filex)) as fx:
             res += edit_source(fx.read()) + "\n\\end{lstlisting}\n\n"
 
